@@ -1,10 +1,9 @@
-name: Build RustDesk Windows Client
-
+name: RustDesk Boszhard ICT
 on:
   workflow_dispatch:
   push:
     branches:
-      - main  # of `master`, afhankelijk van je default branch
+      - main  # of 'master', afhankelijk van jouw default branch
 
 env:
   RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
@@ -29,19 +28,21 @@ jobs:
       uses: dtolnay/rust-toolchain@stable
 
     - name: Install dependencies
-      run: |
-        flutter pub get
+      run: flutter pub get
+      working-directory: ./flutter
 
     - name: Generate build files
       run: |
         echo "const kRendezvousServer = '$env:RENDEZVOUS_SERVER';" > lib/config.dart
         echo "const kRsPubKey = '$env:RS_PUB_KEY';" >> lib/config.dart
+      working-directory: ./flutter
 
     - name: Build EXE
       run: flutter build windows
+      working-directory: ./flutter
 
     - name: Upload Build
       uses: actions/upload-artifact@v4
       with:
         name: rustdesk-windows-build
-        path: build/windows/runner/Release/
+        path: flutter/build/windows/runner/Release/
