@@ -2,6 +2,9 @@ name: Build RustDesk Windows Client
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main  # of `master`, afhankelijk van je default branch
 
 env:
   RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
