@@ -1,0 +1,44 @@
+name: Build RustDesk Windows Client
+
+on:
+  workflow_dispatch:
+
+env:
+  RENDEZVOUS_SERVER: ${{ secrets.RENDEZVOUS_SERVER }}
+  RS_PUB_KEY: ${{ secrets.RS_PUB_KEY }}
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: '3.13.6'
+
+    - name: Enable Windows Desktop
+      run: flutter config --enable-windows-desktop
+
+    - name: Install Rust
+      uses: dtolnay/rust-toolchain@stable
+
+    - name: Install dependencies
+      run: |
+        flutter pub get
+
+    - name: Generate build files
+      run: |
+        echo "const kRendezvousServer = '$env:RENDEZVOUS_SERVER';" > lib/config.dart
+        echo "const kRsPubKey = '$env:RS_PUB_KEY';" >> lib/config.dart
+
+    - name: Build EXE
+      run: flutter build windows
+
+    - name: Upload Build
+      uses: actions/upload-artifact@v3
+      with:
+        name: rustdesk-windows-build
+        path: build/windows/runner/Release/
